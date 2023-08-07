@@ -1,6 +1,16 @@
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const { secret } = require("./config");
 const connection = require("./dbConfig");
 const User = require("./models/User");
+
+const generateAccessToken = (id, email) => {
+  const payload = {
+    id,
+    email,
+  };
+  return jwt.sign(payload, secret, { expiresIn: "24h" });
+};
 class authController {
   async registration(req, res) {
     const { name, password, email } = req.body;
@@ -25,6 +35,17 @@ class authController {
   }
   async login(req, res) {
     try {
+      const { email, password } = req.body;
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(400).json({ message: "User not found" });
+      }
+      const validPassword = bcrypt.compareSync(password, user.password);
+      if (!validPassword) {
+        return res.status(400).json({ message: "Incorrect Password" });
+      }
+      const token = generateAccessToken(user.id, user.email);
+      return res.json({ token });
     } catch (error) {}
   }
   async getUsers(req, res) {
