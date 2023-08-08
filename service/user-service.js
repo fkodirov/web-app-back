@@ -38,6 +38,9 @@ class UserService {
     if (!isPassEquals) {
       throw apiError.BadRequest("Incorrect Password");
     }
+    if (user.status === "blocked") {
+      throw apiError.BadRequest("User blocked!");
+    }
     const tokens = tokenService.generateTokens({
       user: user.id,
       email: user.email,
