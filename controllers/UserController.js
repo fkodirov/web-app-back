@@ -37,34 +37,35 @@ class UserController {
         httpOnly: true,
       });
       return res.status(200).json({ userData });
-      // const user = await User.findOne({ email });
-      // if (!user) {
-      //   return res.status(400).json({ message: "User not found" });
-      // }
-      // const validPassword = bcrypt.compareSync(password, user.password);
-      // if (!validPassword) {
-      //   return res.status(400).json({ message: "Incorrect Password" });
-      // }
-      // // const token = generateAccessToken(user.id, user.email);
-      // return res.json({ token });
     } catch (error) {
       next(error);
     }
   }
   async logout(req, res, next) {
     try {
+      const { refreshToken } = req.cookies;
+      const token = await userService.logout(refreshToken);
+      res.clearCookie("refreshToken");
+      return res.json(token);
     } catch (error) {
       next(error);
     }
   }
   async refresh(req, res, next) {
     try {
+      const { refreshToken } = req.cookies;
+      const userData = await userService.refresh(refreshToken);
+      res.cookie("refreshToken", userData.refreshToken, {
+        maxAge: 20 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+      });
+      return res.status(200).json({ userData });
     } catch (error) {
       next(error);
     }
   }
   async getUsers(req, res) {
-    const users = await User.findAll();
+    const users = await userService.getAllUsers();
     res.json(users);
     try {
     } catch (error) {

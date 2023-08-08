@@ -49,6 +49,37 @@ class UserService {
       email: user.email,
     };
   }
+  async logout(refreshToken) {
+    const token = await tokenService.removeToken(refreshToken);
+    return token;
+  }
+
+  async refresh(refreshToken) {
+    if (!refreshToken) {
+      throw apiError.UnauthorizedError();
+    }
+    const userData = tokenService.validateRefrshToken(refreshToken);
+    const tokenFromDb = await tokenService.findToken(refreshToken);
+    if (!userData || !tokenFromDb) {
+      throw apiError.UnauthorizedError();
+    }
+    const user = await userModel.findOne({ where: { id: tokenFromDb.userId } });
+    const tokens = tokenService.generateTokens({
+      user: user.id,
+      email: user.email,
+    });
+    await tokenService.saveToken(user.id, tokens.refreshToken);
+    return {
+      ...tokens,
+      user: user.id,
+      email: user.email,
+    };
+  }
+
+  async getAllUsers() {
+    const users = await userModel.findAll();
+    return users;
+  }
 }
 
 module.exports = new UserService();
