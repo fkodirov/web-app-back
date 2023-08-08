@@ -43,6 +43,8 @@ class UserService {
       email: user.email,
     });
     await tokenService.saveToken(user.id, tokens.refreshToken);
+    user.lastLoginDate = new Date();
+    await user.save();
     return {
       ...tokens,
       user: user.id,

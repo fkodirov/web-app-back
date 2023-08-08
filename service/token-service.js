@@ -48,7 +48,7 @@ class TokenService {
     const arg = isNaN(identifier)
       ? { refreshToken: identifier }
       : { userId: identifier };
-    const tokenData = await tokenModel.destroy({
+    await tokenModel.destroy({
       where: arg,
     });
   }
