@@ -1,18 +1,10 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-// const { secret } = require("../config");
 const UserService = require("../service/user-service");
 const connection = require("../dbconnect/dbconnect");
 const User = require("../models/User");
 const userService = require("../service/user-service");
 
-// const generateAccessToken = (id, email) => {
-//   const payload = {
-//     id,
-//     email,
-//   };
-//   return jwt.sign(payload, secret, { expiresIn: "24h" });
-// };
 class UserController {
   async registration(req, res, next) {
     try {
@@ -64,10 +56,29 @@ class UserController {
       next(error);
     }
   }
-  async getUsers(req, res) {
-    const users = await userService.getAllUsers();
-    res.json(users);
+  async getUsers(req, res, next) {
     try {
+      const users = await userService.getAllUsers();
+      res.json(users);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async deleteUsers(req, res, next) {
+    try {
+      const userId = +req.params.id;
+      await userService.deleteUsers(userId);
+      res.json({ message: "User deleted." });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async updateUsers(req, res, next) {
+    try {
+      const { status } = req.body;
+      const userId = +req.params.id;
+      await userService.updateUsers(userId, status);
+      res.json({ message: "User updated." });
     } catch (error) {
       next(error);
     }

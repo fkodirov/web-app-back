@@ -44,11 +44,12 @@ class TokenService {
 
     return tokenData;
   }
-  async removeToken(refreshToken) {
+  async removeToken(identifier) {
+    const arg = isNaN(identifier)
+      ? { refreshToken: identifier }
+      : { userId: identifier };
     const tokenData = await tokenModel.destroy({
-      where: {
-        refreshToken,
-      },
+      where: arg,
     });
   }
 

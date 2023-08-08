@@ -80,6 +80,15 @@ class UserService {
     const users = await userModel.findAll();
     return users;
   }
+  async deleteUsers(id) {
+    await userModel.destroy({ where: { id } });
+    await tokenService.removeToken(id);
+  }
+  async updateUsers(id, status) {
+    const user = await userModel.findOne({ where: { id } });
+    user.status = status;
+    await user.save();
+  }
 }
 
 module.exports = new UserService();
