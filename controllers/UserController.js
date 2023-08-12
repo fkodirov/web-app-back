@@ -14,7 +14,7 @@ class UserController {
         maxAge: 20 * 24 * 60 * 60 * 1000,
         httpOnly: true,
       });
-      return res.status(200).json({ userData });
+      return res.status(200).json({ ...userData });
       // res.status(200).json({ message: "User registered successfully" });
     } catch (error) {
       next(error);
@@ -28,7 +28,7 @@ class UserController {
         maxAge: 20 * 24 * 60 * 60 * 1000,
         httpOnly: true,
       });
-      return res.status(200).json({ userData });
+      return res.status(200).json({ ...userData });
     } catch (error) {
       next(error);
     }
@@ -51,7 +51,7 @@ class UserController {
         maxAge: 20 * 24 * 60 * 60 * 1000,
         httpOnly: true,
       });
-      return res.status(200).json({ userData });
+      return res.status(200).json({ ...userData });
     } catch (error) {
       next(error);
     }
@@ -60,6 +60,15 @@ class UserController {
     try {
       const users = await userService.getAllUsers();
       res.json(users);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getUser(req, res, next) {
+    try {
+      const id = +req.params.id;
+      const user = await userService.getUser(id);
+      res.json(user);
     } catch (error) {
       next(error);
     }

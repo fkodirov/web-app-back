@@ -3,12 +3,26 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const tokenService = require("./token-service");
 const apiError = require("../exceptions/api-error");
-
+const EMAIL_REGEXP =
+  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+function validateEmail(value) {
+  return EMAIL_REGEXP.test(value);
+}
 class UserService {
   async registration(name, email, password) {
     const candidate = await userModel.findOne({ where: { email: email } });
     if (candidate) {
       throw apiError.BadRequest("A user with the same email already exists");
+    }
+    if (name === "") {
+      throw apiError.BadRequest("The user name must not be empty.");
+    }
+
+    if (!validateEmail(email)) {
+      throw apiError.BadRequest("Invalid email address");
+    }
+    if (password === "") {
+      throw apiError.BadRequest("The password must not be empty.");
     }
     const saltRounds = 8;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -24,8 +38,7 @@ class UserService {
     await tokenService.saveToken(newUser.id, tokens.refreshToken);
     return {
       ...tokens,
-      user: newUser.id,
-      email: newUser.email,
+      user: { id: newUser.id, email: newUser.email },
     };
   }
 
@@ -50,8 +63,7 @@ class UserService {
     await user.save();
     return {
       ...tokens,
-      user: user.id,
-      email: user.email,
+      user: { id: user.id, email: user.email },
     };
   }
   async logout(refreshToken) {
@@ -76,14 +88,17 @@ class UserService {
     await tokenService.saveToken(user.id, tokens.refreshToken);
     return {
       ...tokens,
-      user: user.id,
-      email: user.email,
+      user: { id: user.id, email: user.email },
     };
   }
 
   async getAllUsers() {
     const users = await userModel.findAll();
     return users;
+  }
+  async getUser(id) {
+    const user = await userModel.findOne({ where: { id } });
+    return user;
   }
   async deleteUsers(id) {
     await userModel.destroy({ where: { id } });
