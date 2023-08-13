@@ -1,22 +1,9 @@
 {
   "name": "web-app-back",
   "version": "1.0.0",
-  "description": "",
   "scripts": {
-    "build": "echo \"No build specified\" && exit 1",
-    "test": "echo \"No test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "nodemon index.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/fkodirov/web-app-back.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/fkodirov/web-app-back/issues"
-  },
-  "homepage": "https://github.com/fkodirov/web-app-back#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
@@ -27,8 +14,5 @@
     "mysql2": "^3.6.0",
     "nodemon": "^3.0.1",
     "sequelize": "^6.32.1"
-  },
-  "engines": {
-    "node": "18.16.0"
   }
 }
